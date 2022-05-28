@@ -45,6 +45,26 @@ public class FXMLController {
     @FXML
     void doCreaGrafo(ActionEvent event) {
 
+    	this.txtResult.clear();
+    	
+    	float x = -1;
+    	try {
+    		x = Float.parseFloat(this.txtGoals.getText());
+    	} catch (Exception e) {
+    		this.txtResult.setText("inserire un valore numerico");
+    	}
+    	
+    	if(x <= 0)
+    		this.txtResult.setText("inserire un valore numerico maggiore di zero");
+    	
+    	this.model.creaGrafo(x);
+    	
+    	int a = this.model.getnVertici();
+    	int b = this.model.getnArchi();
+    	
+    	this.txtResult.appendText("Grafo creato!\n");
+    	this.txtResult.appendText("#VERTICI: "+a+"\n");
+    	this.txtResult.appendText("#ARCHI: "+b+"\n");
     }
 
     @FXML
