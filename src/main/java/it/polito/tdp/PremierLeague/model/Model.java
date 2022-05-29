@@ -19,7 +19,7 @@ public class Model {
 	private List<PlayerDT> listPlayerDT;
 	private List<PlayerDT> dreamTeam;
 	private double gradoMax;
-	
+	private int K;
 	
 	public Model() {
 		dao = new PremierLeagueDAO();
@@ -97,7 +97,7 @@ public class Model {
 		if(this.grafo == null)
 			return null;
 		
-		List<PlayerDT> l = new ArrayList<>();
+		List<PlayerDT> l = new ArrayList<PlayerDT>();
 		
 		for(Player p : this.grafo.vertexSet()) {
 			
@@ -123,23 +123,24 @@ public class Model {
 	
 	
 	public List<PlayerDT> getDreamTeam(int k){
-		
+		this.K = k;
 		this.listPlayerDT = getPlayerDT();
-		List<PlayerDT> parziale = new ArrayList<>();
-		dreamTeam = new ArrayList<>();
+		List<PlayerDT> parziale = new ArrayList<PlayerDT>();
+		dreamTeam = new ArrayList<PlayerDT>();
 		gradoMax = Integer.MIN_VALUE;
 		
-		cerca(parziale, 0, k);
+		cerca(parziale, 0);
 		return dreamTeam;
 	}
 	
-	private void cerca(List<PlayerDT> parziale, int livello, int k) {
+	private void cerca(List<PlayerDT> parziale, int livello) {
 		
-		if(livello == k) {
+		if(livello == K) {
 			
 			if(calcolaGrado(parziale) > gradoMax) {
 				gradoMax = calcolaGrado(parziale);
 				dreamTeam = new ArrayList<>(parziale);
+				System.out.println("grado calcolato: "+gradoMax);
 			}
 			
 		}else {
@@ -150,33 +151,31 @@ public class Model {
 					parziale.add(pdt);
 					
 					if(aggiuntaPossibile(parziale))
-						this.cerca(parziale, livello+1, k);
+						this.cerca(parziale, livello+1);
 					
 					parziale.remove(parziale.size()-1);
 				}
 				
-			}
-			
+			}	
 		}
-		
-		
+				
 	}
 
 	private boolean aggiuntaPossibile(List<PlayerDT> parz) {
 		
-		if(parz.size() <= 1)
+		if(parz.size() == 1)
 			return true;
 		
 		boolean ok = true;
 
-		PlayerDT last = parz.remove(parz.size()-1);
+		Player last = parz.remove(parz.size()-1).getPlayer();
 		
 		for(PlayerDT p : parz) {
 			
 			for(DefaultWeightedEdge e : this.grafo.outgoingEdgesOf(p.getPlayer()))
-				if(this.grafo.getEdgeTarget(e).equals(last.getPlayer())) {
+				if(this.grafo.getEdgeTarget(e).equals(last)) {
 					ok = false;
-					break;
+					//break;
 				}
 		}
 		
@@ -187,9 +186,9 @@ public class Model {
 
 		double grado = 0;
 		
-		for(PlayerDT p : parziale) {
+		for(PlayerDT p : parziale) 
 			grado += p.getGradoTit();
-		}
+		
 
 		return grado;
 	}
