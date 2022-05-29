@@ -16,6 +16,10 @@ public class Model {
 	
 	private Map<Integer, Player> mapPlayers;
 	
+	private List<PlayerDT> listPlayerDT;
+	private List<PlayerDT> dreamTeam;
+	private double gradoMax;
+	
 	
 	public Model() {
 		dao = new PremierLeagueDAO();
@@ -68,5 +72,126 @@ public class Model {
 		
 	}
 	
+	public List<Opponent> getOpponents(Player top){
+		
+		List<Opponent> l = new ArrayList<Opponent>();
+		
+		for(DefaultWeightedEdge e : this.grafo.outgoingEdgesOf(top)) {
+			
+			Opponent o = new Opponent(this.grafo.getEdgeTarget(e), this.grafo.getEdgeWeight(e));
+			
+			l.add(o);
+		}
+		
+		Collections.sort(l);
+		return l;
+			
+	}
+	
+	
+	//Parte 2!
+	
+	
+	public List<PlayerDT> getPlayerDT(){
+		
+		if(this.grafo == null)
+			return null;
+		
+		List<PlayerDT> l = new ArrayList<>();
+		
+		for(Player p : this.grafo.vertexSet()) {
+			
+			double a = 0;
+			for(DefaultWeightedEdge e : this.grafo.outgoingEdgesOf(p))
+				a += this.grafo.getEdgeWeight(e);
+			
+			double b = 0;
+			for(DefaultWeightedEdge e : this.grafo.incomingEdgesOf(p))
+				b += this.grafo.getEdgeWeight(e);
+			
+			double c = a-b;
+			
+			PlayerDT pdt = new PlayerDT(p, c);
+			l.add(pdt);
+		}
+		
+		Collections.sort(l);
+		
+		return l;
+		
+	}
+	
+	
+	public List<PlayerDT> getDreamTeam(int k){
+		
+		this.listPlayerDT = getPlayerDT();
+		List<PlayerDT> parziale = new ArrayList<>();
+		dreamTeam = new ArrayList<>();
+		gradoMax = Integer.MIN_VALUE;
+		
+		cerca(parziale, 0, k);
+		return dreamTeam;
+	}
+	
+	private void cerca(List<PlayerDT> parziale, int livello, int k) {
+		
+		if(livello == k) {
+			
+			if(calcolaGrado(parziale) > gradoMax) {
+				gradoMax = calcolaGrado(parziale);
+				dreamTeam = new ArrayList<>(parziale);
+			}
+			
+		}else {
+			
+			for(PlayerDT pdt : this.listPlayerDT) {
+				
+				if(!parziale.contains(pdt)) {
+					parziale.add(pdt);
+					
+					if(aggiuntaPossibile(parziale))
+						this.cerca(parziale, livello+1, k);
+					
+					parziale.remove(parziale.size()-1);
+				}
+				
+			}
+			
+		}
+		
+		
+	}
+
+	private boolean aggiuntaPossibile(List<PlayerDT> parz) {
+		
+		if(parz.size() <= 1)
+			return true;
+		
+		boolean ok = true;
+
+		PlayerDT last = parz.remove(parz.size()-1);
+		
+		for(PlayerDT p : parz) {
+			
+			for(DefaultWeightedEdge e : this.grafo.outgoingEdgesOf(p.getPlayer()))
+				if(this.grafo.getEdgeTarget(e).equals(last.getPlayer())) {
+					ok = false;
+					break;
+				}
+		}
+		
+		return ok;
+	}
+
+	private double calcolaGrado(List<PlayerDT> parziale) {
+
+		double grado = 0;
+		
+		for(PlayerDT p : parziale) {
+			grado += p.getGradoTit();
+		}
+
+		return grado;
+	}
 	
 }

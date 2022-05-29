@@ -5,9 +5,12 @@
 package it.polito.tdp.PremierLeague;
 
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
 
 import it.polito.tdp.PremierLeague.model.Model;
+import it.polito.tdp.PremierLeague.model.Opponent;
+import it.polito.tdp.PremierLeague.model.Player;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -74,6 +77,20 @@ public class FXMLController {
 
     @FXML
     void doTopPlayer(ActionEvent event) {
+    	
+    	this.txtResult.clear();
+    	Player best = this.model.getTopPlayer();
+    	
+    	if(best == null)
+    		this.txtResult.setText("creare prima il grafo");
+    	
+    	List<Opponent> list = this.model.getOpponents(best);
+    	
+    	this.txtResult.appendText("Top Player: "+best.toString()+"\n\n");
+    	
+    	for(Opponent o : list)
+    		this.txtResult.appendText(o.toString()+"\n");
+    	
 
     }
 
