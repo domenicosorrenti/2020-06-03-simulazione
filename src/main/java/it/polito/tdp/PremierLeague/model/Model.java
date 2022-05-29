@@ -53,20 +53,18 @@ public class Model {
 		return this.grafo.edgeSet().size();
 	}
 	
-	public List<TopPlayer> listTopPlayers(){
+	public Player getTopPlayer(){
 		
-		List<TopPlayer> l = new ArrayList<TopPlayer>();
+		Player best = null;
+		int max = Integer.MIN_VALUE;
 		
-		for(Player p : this.grafo.vertexSet()) {
+		for(Player p : this.grafo.vertexSet()) 
+			if(this.grafo.outDegreeOf(p) > max) {
+				max = this.grafo.outDegreeOf(p);
+				best = p;
+			}
 			
-			double a = 0;
-			
-			for(DefaultWeightedEdge e : this.grafo.outgoingEdgesOf(p))
-				a = 0;
-			
-		}
-		
-		return null;
+		return best;
 		
 	}
 	
