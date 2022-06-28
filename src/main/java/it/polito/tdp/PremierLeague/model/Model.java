@@ -30,6 +30,8 @@ public class Model {
 		
 	}
 	
+	//PARTE 1
+	
 	public void creaGrafo(float x) {
 		
 		this.grafo = new SimpleDirectedWeightedGraph<Player, DefaultWeightedEdge>(DefaultWeightedEdge.class);
@@ -38,7 +40,8 @@ public class Model {
 		
 		Graphs.addAllVertices(this.grafo, vertici);
 		
-		List<Arco> archi = dao.getArchi(mapPlayers, x);
+		/* METODO 1 IN CUI TROVO SUBITO TUTTI GLI ARCHI DEL GRAFO
+		 * List<Arco> archi = dao.getArchi(mapPlayers, x);
 		
 		for(Arco a : archi) {
 			
@@ -46,7 +49,15 @@ public class Model {
 				Graphs.addEdgeWithVertices(this.grafo, a.getP1(), a.getP2(), a.getPeso() );
 			else
 				Graphs.addEdgeWithVertices(this.grafo, a.getP2(), a.getP1(), ( (float) -1) * a.getPeso() );	
-		}
+		}*/
+		
+		//METODO ALTERNATIVO PER OTTENERE GLI ARCHI (VEDERE IL DAO PER VEDERE LA QUERY)
+		List<Arco> archi = dao.getArchi2(mapPlayers);
+		
+		for(Arco a : archi)
+			if(this.grafo.containsVertex(a.getP1()) && this.grafo.containsVertex(a.getP2()))
+				Graphs.addEdgeWithVertices(this.grafo, a.getP1(), a.getP2(), a.getPeso());
+		
 	}
 	
 	public int getnVertici(){
@@ -89,8 +100,7 @@ public class Model {
 	}
 	
 	
-	//Parte 2!
-	
+	//PARTE 2!
 	
 	public List<PlayerDT> getPlayerDT(){
 		
@@ -126,7 +136,7 @@ public class Model {
 		this.K = k;
 		this.listPlayerDT = getPlayerDT();
 		List<PlayerDT> parziale = new ArrayList<PlayerDT>();
-		dreamTeam = new ArrayList<PlayerDT>();
+		this.dreamTeam = new ArrayList<PlayerDT>();
 		gradoMax = Integer.MIN_VALUE;
 		
 		cerca(parziale, 0);
@@ -135,12 +145,12 @@ public class Model {
 	
 	private void cerca(List<PlayerDT> parziale, int livello) {
 		
-		if(livello == K) {
+		if(livello == this.K) {
 			
 			if(calcolaGrado(parziale) > gradoMax) {
 				gradoMax = calcolaGrado(parziale);
 				dreamTeam = new ArrayList<>(parziale);
-				System.out.println("grado calcolato: "+gradoMax);
+				//System.out.println("grado calcolato: "+gradoMax);
 			}
 			
 		}else {
@@ -168,14 +178,17 @@ public class Model {
 		
 		boolean ok = true;
 
-		Player last = parz.remove(parz.size()-1).getPlayer();
+		Player last = parz.get(parz.size()-1).getPlayer();
 		
 		for(PlayerDT p : parz) {
+			
+			if(p.getPlayer().equals(last))
+				continue;
 			
 			for(DefaultWeightedEdge e : this.grafo.outgoingEdgesOf(p.getPlayer()))
 				if(this.grafo.getEdgeTarget(e).equals(last)) {
 					ok = false;
-					//break;
+					break;
 				}
 		}
 		
@@ -183,14 +196,18 @@ public class Model {
 	}
 
 	private double calcolaGrado(List<PlayerDT> parziale) {
-
 		double grado = 0;
 		
 		for(PlayerDT p : parziale) 
 			grado += p.getGradoTit();
-		
-
+	
 		return grado;
 	}
+
+	public double getGradoMax() {
+		return gradoMax;
+	}
+	
+	
 	
 }

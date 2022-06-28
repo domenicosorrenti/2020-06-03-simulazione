@@ -11,6 +11,7 @@ import java.util.ResourceBundle;
 import it.polito.tdp.PremierLeague.model.Model;
 import it.polito.tdp.PremierLeague.model.Opponent;
 import it.polito.tdp.PremierLeague.model.Player;
+import it.polito.tdp.PremierLeague.model.PlayerDT;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -72,7 +73,25 @@ public class FXMLController {
 
     @FXML
     void doDreamTeam(ActionEvent event) {
+    	
+    	this.txtResult.clear();
+    	
+    	int k = 0;
+    	try {
+    		k = Integer.parseInt(this.txtK.getText());
+    	}catch(Exception e) {
+    		this.txtResult.appendText("inserire un numero intero positivo per creare il tuo DT!");
+    	}
+    	if(k<=0)
+    		this.txtResult.appendText("inserire un numero intero positivo per creare il tuo DT!");
+    	
+    	List<PlayerDT> list = this.model.getDreamTeam(k);
+    	double gradoMax = this.model.getGradoMax();
 
+    	this.txtResult.appendText("Grado DT: "+gradoMax+"\n\n");
+    	
+    	for(PlayerDT pdt : list)
+    		this.txtResult.appendText(pdt+"\n");
     }
 
     @FXML

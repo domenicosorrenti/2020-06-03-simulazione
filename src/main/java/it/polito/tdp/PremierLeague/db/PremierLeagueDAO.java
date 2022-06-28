@@ -159,4 +159,40 @@ public class PremierLeagueDAO {
 			return null;
 		}
 	}
+	
+
+	public List<Arco> getArchi2(Map<Integer, Player> mapPlayers){
+		
+		String sql = "SELECT a1.PlayerID as id1, a2.PlayerID as id2, (SUM(a1.TimePlayed) - SUM(a2.TimePlayed)) AS s "
+				+ "FROM actions a1, actions a2 "
+				+ "WHERE a1.MatchID = a2.MatchID AND a1.Starts = 1 AND a1.Starts = a2.Starts "
+				+ "AND a1.PlayerID <> a2.PlayerID AND a1.TeamID <> a2.TeamID "
+				+ "GROUP BY a1.PlayerID,a2.PlayerID "
+				+ "HAVING s > 0";
+		
+
+		List<Arco> result = new ArrayList<Arco>();
+		
+		Connection conn = DBConnect.getConnection();
+
+		try {
+			PreparedStatement st = conn.prepareStatement(sql);
+			ResultSet res = st.executeQuery();
+			while (res.next()) {
+				
+				Player p1 = mapPlayers.get(res.getInt("id1"));
+				Player p2 = mapPlayers.get(res.getInt("id2"));
+				float peso = res.getFloat("s");
+				Arco a = new Arco(p1, p2, peso);
+				
+				result.add(a);
+			}
+			conn.close();
+			return result;
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
 }

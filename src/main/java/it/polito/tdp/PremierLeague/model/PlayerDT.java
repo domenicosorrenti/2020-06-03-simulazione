@@ -20,9 +20,9 @@ public class PlayerDT implements Comparable<PlayerDT>{
 
 	@Override
 	public int compareTo(PlayerDT other) {
-		
 		return (int) (other.getGradoTit() - this.gradoTit);
 	}
+	
 	@Override
 	public String toString() {
 		return player +" : "+ gradoTit;

@@ -2,9 +2,10 @@ package it.polito.tdp.PremierLeague.model;
 
 public class Arco {
 
-	Player p1;
-	Player p2;
-	float peso;
+	private Player p1;
+	private Player p2;
+	private float peso;
+	
 	public Arco(Player p1, Player p2, float peso) {
 		super();
 		this.p1 = p1;
